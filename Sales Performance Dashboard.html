@@ -1,0 +1,40 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sales Performance Dashboard</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f4f6fa;--card:#fff;--tx:#1b2433;--mu:#6b7686;--ac:#2563eb;--ac2:#16a34a;--bd:#e3e8f0}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1520;--card:#182131;--tx:#e8edf5;--mu:#93a0b4;--ac:#60a5fa;--ac2:#4ade80;--bd:#273247}}
+:root[data-theme="dark"]{--bg:#0f1520;--card:#182131;--tx:#e8edf5;--mu:#93a0b4;--ac:#60a5fa;--ac2:#4ade80;--bd:#273247}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;padding:16px}
+h1{font-size:20px;margin:0 0 2px}.sub{color:var(--mu);font-size:13px;margin-bottom:14px}
+.g{display:grid;gap:12px}.k{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}.c2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr));margin-top:12px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:14px;min-width:0}
+.kl{font-size:12px;color:var(--mu)}.kv{font-size:24px;font-weight:700;margin-top:2px}
+h2{font-size:14px;margin:0 0 10px;display:flex;justify-content:space-between;align-items:center}
+button{border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:3px 10px;border-radius:6px;font-size:12px;cursor:pointer}button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.row{display:flex;align-items:center;gap:8px;font-size:12px;margin:6px 0}.row .n{width:110px;flex:none}.bar{height:14px;background:var(--ac);border-radius:3px}.row .v{color:var(--mu);white-space:nowrap}
+svg{width:100%;height:auto;display:block}.note{font-size:12px;color:var(--mu);margin-top:12px}
+</style></head><body>
+<h1>Sales Performance Dashboard</h1><div class="sub">10,500 retail orders · Jan 2023 – Dec 2024 · SQL analysis</div>
+<div class="g k" id="k"></div>
+<div class="card" style="margin-top:12px"><h2>Monthly trend <span><button id="b1" class="on">Revenue</button> <button id="b2">Profit</button></span></h2><svg id="ln" viewBox="0 0 700 220"></svg><div class="sub" id="ln-note" style="margin:6px 0 0"></div></div>
+<div class="g c2"><div class="card"><h2>Category: revenue &amp; margin</h2><div id="cat"></div></div>
+<div class="card"><h2>Top 5 products by revenue</h2><div id="top"></div></div>
+<div class="card"><h2>Revenue by region</h2><div id="reg"></div></div></div>
+<div class="note" id="ins"></div>
+<script>
+const D={"kpi": [10500, 164314910.0, 19507680.0, 11.9], "monthly": [["2023-01", 6936025.0, 814800.0, null], ["2023-02", 6077295.0, 724178.0, -12.4], ["2023-03", 7098705.0, 822893.0, 16.8], ["2023-04", 6175903.0, 793099.0, -13.0], ["2023-05", 7286025.0, 854231.0, 18.0], ["2023-06", 6593170.0, 755146.0, -9.5], ["2023-07", 6642385.0, 868540.0, 0.7], ["2023-08", 7058238.0, 786905.0, 6.3], ["2023-09", 5714160.0, 716524.0, -19.0], ["2023-10", 7803130.0, 960451.0, 36.6], ["2023-11", 7838745.0, 938471.0, 0.5], ["2023-12", 7601355.0, 858809.0, -3.0], ["2024-01", 6125890.0, 726668.0, -19.4], ["2024-02", 6637760.0, 789732.0, 8.4], ["2024-03", 6329550.0, 729633.0, -4.6], ["2024-04", 7014073.0, 818113.0, 10.8], ["2024-05", 6783565.0, 773886.0, -3.3], ["2024-06", 5665673.0, 725654.0, -16.5], ["2024-07", 6499815.0, 754766.0, 14.7], ["2024-08", 7392440.0, 856631.0, 13.7], ["2024-09", 6320870.0, 766699.0, -14.5], ["2024-10", 6608580.0, 791929.0, 4.6], ["2024-11", 7062188.0, 811459.0, 6.9], ["2024-12", 9049373.0, 1068464.0, 28.1]], "category": [["Technology", 91808800.0, 11579944.0, 12.6], ["Furniture", 66920325.0, 6549103.0, 9.8], ["Office Supplies", 5585785.0, 1378633.0, 24.7]], "top": [["Smartphone X", 52577100.0, 5612015.0], ["Standing Desk", 35715000.0, 2399532.0], ["Laser Printer", 26262000.0, 2363609.0], ["Ergo Office Chair", 18197400.0, 2621926.0], ["Wooden Bookcase", 13007925.0, 1527646.0]], "region": [["East", 42419410.0], ["West", 40755170.0], ["South", 40717955.0], ["North", 40422375.0]], "season": [7660562.0, 6575086.0], "season_pct": 16.5};
+const cr=v=>v>=1e7?(v/1e7).toFixed(2)+' Cr':v>=1e5?(v/1e5).toFixed(1)+' L':Math.round(v).toLocaleString('en-IN');
+document.getElementById('k').innerHTML=[['Orders',D.kpi[0].toLocaleString('en-IN')],['Revenue','₹'+cr(D.kpi[1])],['Profit','₹'+cr(D.kpi[2])],['Profit margin',D.kpi[3]+'%'],['Peak-season lift','+'+D.season_pct+'%']].map(x=>`<div class="card"><div class="kl">${x[0]}</div><div class="kv">${x[1]}</div></div>`).join('');
+function line(i){const m=D.monthly,v=m.map(r=>r[i]),mx=Math.max(...v),X=j=>40+j*(640/(m.length-1)),Y=y=>190-y/mx*170;
+let s=`<polyline fill="none" stroke="var(--ac)" stroke-width="2.5" points="${v.map((y,j)=>X(j)+','+Y(y)).join(' ')}"/>`;
+s+=v.map((y,j)=>`<circle cx="${X(j)}" cy="${Y(y)}" r="3.5" fill="var(--ac)"><title>${m[j][0]}: ₹${cr(y)}${m[j][3]!=null?' ('+(m[j][3]>0?'+':'')+m[j][3]+'% MoM)':''}</title></circle>`).join('');
+s+=[0,6,12,18,23].map(j=>`<text x="${X(j)}" y="210" font-size="11" text-anchor="middle" fill="var(--mu)">${m[j][0]}</text>`).join('');
+s+=`<text x="4" y="24" font-size="11" fill="var(--mu)">₹${cr(mx)}</text>`;document.getElementById('ln').innerHTML=s}
+line(1);const b1=document.getElementById('b1'),b2=document.getElementById('b2');
+b1.onclick=()=>{line(1);b1.className='on';b2.className=''};b2.onclick=()=>{line(2);b2.className='on';b1.className=''};
+function bars(id,rows,f){const mx=Math.max(...rows.map(r=>r[1]));document.getElementById(id).innerHTML=rows.map(r=>`<div class="row"><div class="n">${r[0]}</div><div style="flex:1"><div class="bar" style="width:${r[1]/mx*100}%"></div></div><div class="v">${f(r)}</div></div>`).join('')}
+bars('cat',D.category,r=>'₹'+cr(r[1])+' · '+r[3]+'% margin');bars('top',D.top,r=>'₹'+cr(r[1]));bars('reg',D.region,r=>'₹'+cr(r[1]));
+const c=D.category,best=[...c].sort((a,b)=>b[3]-a[3])[0];
+document.getElementById('ins').innerHTML=`<b>Insights:</b> ${c[0][0]} drives the most revenue (₹${cr(c[0][1])}), while ${best[0]} has the best margin (${best[3]}%). Average monthly revenue in Oct–Dec is ${D.season_pct}% higher than the rest of the year, so stock and pricing plans should be set before Q4. ${D.top[0][0]} alone is the top seller.`;
+</script></body></html>
